@@ -3,3 +3,6 @@ node_modules/
 dist/
 build/
 *.log
+slm/out/
+slm/data/*.bin
+slm/tokenizer/*.pkl

@@ -1,0 +1,6 @@
+{
+  "n_tokens": 52200,
+  "train": 46980,
+  "val": 5220,
+  "vocab_size": 58
+}
