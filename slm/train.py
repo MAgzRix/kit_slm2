@@ -46,6 +46,8 @@ def evaluate(model, cfg: Config, device):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--iters", type=int, default=None)
+    ap.add_argument("--block-size", type=int, default=None,
+                    help="для маленьких датасетов уменьши, напр. 64 (нужно пересобрать data.py не требуется)")
     ap.add_argument("--batch", type=int, default=None)
     ap.add_argument("--lr", type=float, default=None)
     ap.add_argument("--resume", action="store_true")
@@ -55,6 +57,13 @@ def main():
     if args.iters: cfg.max_iters = args.iters
     if args.batch: cfg.batch_size = args.batch
     if args.lr: cfg.lr = args.lr
+    if args.block_size: cfg.block_size = args.block_size
+    # авто-подстройка под маленький датасет: чанк должен помещаться в val/train
+    import numpy as _np
+    n_val = len(_np.memmap(os.path.join(cfg.bin_dir, "val.bin"), dtype=_np.uint16, mode="r"))
+    while cfg.block_size + 2 > n_val and cfg.block_size > 16:
+        cfg.block_size //= 2
+        print(f"датасет маленький — уменьшаю block_size до {cfg.block_size}")
 
     torch.manual_seed(cfg.seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
